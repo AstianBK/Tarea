@@ -66,7 +66,7 @@ public class SQLUtil {
         try {
             if(con!=null){
                 Statement statement=con.createStatement();
-                ResultSet rs=statement.executeQuery("select * from jugadores where idJugador="+id);
+                ResultSet rs=statement.executeQuery("select * from jugadores where idJugador=" + id );
                 while (rs.next()){
                     jugador=new Jugador(rs.getInt(1),rs.getString(2));
                     jugador.setPuntos(rs.getInt(3));
@@ -84,7 +84,7 @@ public class SQLUtil {
         try {
             if(con!=null){
                 Statement statement=con.createStatement();
-                ResultSet rs=statement.executeQuery("select * from partidos where idPartido="+id);
+                ResultSet rs=statement.executeQuery("select * from partidos where idPartido="  + id );
                 while (rs.next()){
                     partido=new Partido(rs.getInt(1),getEquipoPorNombre(rs.getString(2))
                             ,getEquipoPorNombre(rs.getString(3)),rs.getInt(4),rs.getInt(5)
@@ -103,7 +103,7 @@ public class SQLUtil {
         try {
             if(con!=null){
                 Statement statement=con.createStatement();
-                ResultSet rs=statement.executeQuery("select * from equipos where nombre="+"'"+nombre+"'");
+                ResultSet rs=statement.executeQuery("select * from equipos where nombre=" + "'" + nombre + "'" );
                 while (rs.next()){
                     equipo=new Equipo(rs.getString(1),rs.getString(2));
                 }
@@ -119,7 +119,7 @@ public class SQLUtil {
         try {
             if(con!=null){
                 Statement statement=con.createStatement();
-                statement.executeUpdate("update jugadores set puntos="+puntos+" where idJugador="+idJugador);
+                statement.executeUpdate("update jugadores set puntos=" + puntos + " where idJugador=" + idJugador);
             }
 
         } catch (SQLException e) {
@@ -145,7 +145,7 @@ public class SQLUtil {
             if(con!=null){
                 ArrayList<Pronostico> pronosticos=getPronosticos();
                 Statement statement=con.createStatement();
-                statement.executeUpdate("insert into pronosticos values ("+(pronosticos.size()+1)+","+idJugador+","+idPartido+","+"'"+pronostico+"'"+")");
+                statement.executeUpdate("insert into pronosticos values (" + (pronosticos.size()+1) + "," + idJugador + "," + idPartido + "," + "'" + pronostico+ "'" + ")" );
             }
 
         } catch (SQLException e) {

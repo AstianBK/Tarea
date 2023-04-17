@@ -15,10 +15,10 @@ public class TpIntegrador {
     public static void main(String[] arg) {
         String[] codigos=new String[]{"S","N"};
         ArrayList<Pronostico> pronosticos= SQLUtil.getPronosticos();
-        String cc="";
+        String cc;
         Scanner scanner=new Scanner(System.in);
         do {
-            System.out.println("Desea modificar los puntos S para si o N para dejarlos en predeterminado");
+            System.out.println("Desea modificar los puntos S para si o N para dejarlos en predeterminado:");
             cc=scanner.next();
             if(Objects.equals(cc, "S")){
                 SQLUtil.resetPuntosATodosLosJugadores();
@@ -37,8 +37,8 @@ public class TpIntegrador {
             Partido partidos=pronosticos.get(i).getPartido();
             Jugador jugador=pronosticos.get(i).getJugador();
             boolean flag1=partidos.getEstadoDelPartido().equals(pronosticos.get(i).getResultado());
-            System.out.println(partidos.getEquipo1().getNombre()+"\t"+partidos.getGolesEquipo1()+" vs "+partidos.getEquipo2().getNombre()+"\t"+partidos.getGolesEquipo2()+"\t Ronda "+partidos.getRonda());
-            System.out.println(flag1 ? "Correcto +"+aumentoDePuntos+" punto para el jugador "+jugador.getNombre() +"\n" : "Incorrecto\n");
+            System.out.println( partidos.getEquipo1().getNombre() + "\t" + partidos.getGolesEquipo1() + " vs " + partidos.getEquipo2().getNombre() + "\t" + partidos.getGolesEquipo2() + "\t Ronda " + partidos.getRonda() );
+            System.out.println(flag1 ? "Correcto +" + aumentoDePuntos + " punto para el jugador " + jugador.getNombre() + "\n" : "Incorrecto\n");
             if(flag1){
                 try {
                     updatePuntos(jugador.getIdJugador());
@@ -77,7 +77,7 @@ public class TpIntegrador {
         Jugador jugador=SQLUtil.getJugadorPorId(idjugador);
         if(jugador.puntos<0){
             throw new ExceptionPuntosNegativos(jugador);
-        }{
+        }else {
             SQLUtil.setPuntos(jugador.getIdJugador(),jugador.getPuntos()+aumentoDePuntos);
         }
 
