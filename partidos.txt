@@ -1,6 +1,0 @@
-Argentina;1;ArabiaSaudita;2
-Argentina;2;Mexico;0
-Argentina;2;Polonia;0
-Polonia;0;Mexico;0
-Polonia;0;ArabiaSaudita;0
-Mexico;1;ArabiaSaudita;0

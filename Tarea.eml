@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component inherit-compiler-output="true" inheritJdk="true">
-	<output-test url="file://$MODULE_DIR$/out/test/tp_Integrador.Tarea"/>
+	<output-test url="file://$MODULE_DIR$/out/test/tp_Integrador.TpIntegrador"/>
 	<exclude-output/>
 	<contentEntry url="file://$MODULE_DIR$"/>
 </component>

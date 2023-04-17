@@ -1,4 +1,4 @@
-package tp_Integrador;
+package tp_Integrador.clases;
 
 public class Equipo {
     private String nombre;
