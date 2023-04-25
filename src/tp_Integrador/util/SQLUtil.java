@@ -41,6 +41,69 @@ public class SQLUtil {
         }
         return jugadores;
     }
+    public static ArrayList<Pronostico> getPronosticosPorJugador(int idJugador){
+        Connection con=getConnection();
+        ArrayList<Pronostico> pronosticos=new ArrayList<>();
+        try {
+            if(con!=null){
+                Statement statement=con.createStatement();
+
+                ResultSet rs=statement.executeQuery("select * from pronosticos where idJugador="+idJugador);
+                while (rs.next()){
+                    Pronostico pronostico=new Pronostico(rs.getInt(1),getPartidoPorId(rs.getInt(3)),
+                            rs.getString(4),getJugadorPorId(rs.getInt(2)));
+                    pronosticos.add(pronostico);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return pronosticos;
+    }
+
+    public static int getRondaMax(){
+        Connection con=getConnection();
+        int ronda=1;
+        try {
+            if(con!=null){
+                Statement statement=con.createStatement();
+                ResultSet rs=statement.executeQuery("select ronda from partidos order by ronda");
+                while (rs.next()){
+                    ronda=rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return ronda;
+    }
+
+    public static ArrayList<Pronostico> getPronosticosPorRonda(int numRonda,int idJugador){
+        ArrayList<Pronostico> list=getPronosticosPorJugador(idJugador);
+        ArrayList<Pronostico> pronosticos=new ArrayList<>();
+        int i=0;
+        while(i<list.size()){
+            if(list.get(i).getPartido().getRonda()==numRonda){
+                pronosticos.add(list.get(i));
+            }
+            i++;
+        }
+        return pronosticos;
+    }
+
+    public static int getCantDePartidosPorRonda(int numRonda){
+        ArrayList<Partido> list=getPartidos();
+        int i=0;
+        int cc=0;
+        while(i<list.size()){
+            if(list.get(i).getRonda()==numRonda){
+                cc++;
+            }
+            i++;
+        }
+        return cc;
+    }
+
     public static ArrayList<Pronostico> getPronosticos(){
         Connection con=getConnection();
         ArrayList<Pronostico> pronosticos=new ArrayList<>();
@@ -60,6 +123,7 @@ public class SQLUtil {
         }
         return pronosticos;
     }
+
     public static Jugador getJugadorPorId(int id){
         Connection con=getConnection();
         Jugador jugador=null;
@@ -78,6 +142,28 @@ public class SQLUtil {
         }
         return jugador;
     }
+
+    public static ArrayList<Partido> getPartidos(){
+        Connection con=getConnection();
+        ArrayList<Partido> partidos=new ArrayList<>();
+        try {
+            if(con!=null){
+                Statement statement=con.createStatement();
+                ResultSet rs=statement.executeQuery("select * from partidos");
+                while (rs.next()){
+                    Partido partido=new Partido(rs.getInt(1),getEquipoPorNombre(rs.getString(2))
+                            ,getEquipoPorNombre(rs.getString(3)),rs.getInt(4),rs.getInt(5)
+                            ,rs.getString(6),rs.getInt(7));
+                    partidos.add(partido);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return partidos;
+    }
+
     public static Partido getPartidoPorId(int id){
         Connection con=getConnection();
         Partido partido=null;

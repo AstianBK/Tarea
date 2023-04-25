@@ -7,48 +7,81 @@ import tp_Integrador.exception.ExceptionPuntosNegativos;
 import tp_Integrador.util.SQLUtil;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class TpIntegrador {
     public static int aumentoDePuntos=1;
+
     public static void main(String[] arg) {
-        String[] codigos=new String[]{"S","N"};
-        ArrayList<Pronostico> pronosticos= SQLUtil.getPronosticos();
+        String[] codigos=new String[]{"S","N","R"};
         String cc;
         Scanner scanner=new Scanner(System.in);
+        System.out.println(SQLUtil.getRondaMax());
         do {
             System.out.println("Desea modificar los puntos S para si o N para dejarlos en predeterminado:");
             cc=scanner.next();
-            if(Objects.equals(cc, "S")){
-                SQLUtil.resetPuntosATodosLosJugadores();
-                System.out.println("Ingresar nuevo valor:");
-                aumentoDePuntos=scanner.nextInt();
+            boolean flag=false;
+            switch (cc){
+                case "S":
+                    do {
+                        Scanner scanner1=new Scanner(System.in);
+                        System.out.println("Ingresar nuevo valor:");
+                        if(scanner1.hasNextInt()){
+                            flag=true;
+                            aumentoDePuntos=scanner1.nextInt();
+                        }
+                    }while (!flag);
+
+                    break;
+                case "R":
+                    SQLUtil.resetPuntosATodosLosJugadores();
+                    break;
             }
         }while (!verificarExistencia(cc,codigos));
-        mostrarPronostico(pronosticos);
         ArrayList<Jugador> jugadores=SQLUtil.getJugadores();
-        mostrarJugadores(jugadores);
-    }
-
-    private static void mostrarPronostico(ArrayList<Pronostico> pronosticos) {
         int i=0;
-        while (i<pronosticos.size()){
-            Partido partidos=pronosticos.get(i).getPartido();
-            Jugador jugador=pronosticos.get(i).getJugador();
-            boolean flag1=partidos.getEstadoDelPartido().equals(pronosticos.get(i).getResultado());
-            System.out.println( partidos.getEquipo1().getNombre() + "\t" + partidos.getGolesEquipo1() + " vs " + partidos.getEquipo2().getNombre() + "\t" + partidos.getGolesEquipo2() + "\t Ronda " + partidos.getRonda() );
-            System.out.println(flag1 ? "Correcto +" + aumentoDePuntos + " punto para el jugador " + jugador.getNombre() + "\n" : "Incorrecto\n");
-            if(flag1){
-                try {
-                    updatePuntos(jugador.getIdJugador());
-                } catch (ExceptionPuntosNegativos e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        while (i<jugadores.size()){
+            Jugador jugador=jugadores.get(i);
+            System.out.println("------------------------------------------------Jugador " + jugador.getNombre() + "------------------------------------------------\n");
+            calcularPuntaje(jugador);
             i++;
         }
 
+        mostrarJugadores(jugadores);
+    }
+
+    private static void calcularPuntaje(Jugador pJugador) {
+        int i;
+        int j = 0;
+        boolean aciertoPerfectoDeRondas;
+        while (j<SQLUtil.getRondaMax()){
+            i=0;
+            ArrayList<Pronostico> pronosticos1=SQLUtil.getPronosticosPorRonda(j+1,pJugador.getIdJugador());
+            aciertoPerfectoDeRondas=pronosticos1.size()==SQLUtil.getCantDePartidosPorRonda(j+1);
+
+            System.out.println("------------------------------------------------Ronda " + (j+1) + "------------------------------------------------\n");
+
+            while (i<pronosticos1.size()){
+                Partido partidos=pronosticos1.get(i).getPartido();
+                boolean flag1=partidos.getEstadoDelPartido().equals(pronosticos1.get(i).getResultado());
+
+                System.out.println( partidos.getEquipo1().getNombre() + "\t" + partidos.getGolesEquipo1() + " vs " + partidos.getEquipo2().getNombre() + "\t" + partidos.getGolesEquipo2() + "\t Ronda :" + partidos.getRonda() );
+                System.out.println( flag1 ? "Correcto +" + aumentoDePuntos + " punto para el jugador " + pJugador.getNombre() + "\n" : "Incorrecto\n");
+
+                if(flag1){
+                    pJugador.setPuntos(pJugador.getPuntos()+aumentoDePuntos);
+                }else if(aciertoPerfectoDeRondas){
+                    aciertoPerfectoDeRondas=false;
+                }
+                i++;
+            }
+            if(aciertoPerfectoDeRondas){
+                System.out.println("A acertado todos los pronosticos sobre la ronda "+(j+1)+"\n");
+
+                pJugador.setPuntos( pJugador.getPuntos()+5);
+            }
+            j++;
+        }
     }
 
     public static void mostrarJugadores(ArrayList<Jugador> jugadores){
@@ -71,15 +104,5 @@ public class TpIntegrador {
             i++;
         }
         return flag;
-    }
-
-    public static void updatePuntos(int idjugador)throws ExceptionPuntosNegativos {
-        Jugador jugador=SQLUtil.getJugadorPorId(idjugador);
-        if(jugador.puntos<0){
-            throw new ExceptionPuntosNegativos(jugador);
-        }else {
-            SQLUtil.setPuntos(jugador.getIdJugador(),jugador.getPuntos()+aumentoDePuntos);
-        }
-
     }
 }
