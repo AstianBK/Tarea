@@ -8,7 +8,14 @@ import tp_Integrador.clases.Pronostico;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * SQLUtil  -> contiene metodos y funciones, para la manipulacion y obtencion de datos de una DB.
+ * */
+
 public class SQLUtil {
+
+
+
     public static Connection getConnection(){
         try{
             try {
@@ -22,6 +29,7 @@ public class SQLUtil {
         }
         return null;
     }
+
     public static ArrayList<Jugador> getJugadores(){
         Connection con=getConnection();
         ArrayList<Jugador> jugadores=new ArrayList<>();
@@ -41,6 +49,7 @@ public class SQLUtil {
         }
         return jugadores;
     }
+
     public static ArrayList<Pronostico> getPronosticosPorJugador(int idJugador){
         Connection con=getConnection();
         ArrayList<Pronostico> pronosticos=new ArrayList<>();
@@ -61,16 +70,43 @@ public class SQLUtil {
         return pronosticos;
     }
 
-    public static int getRondaMax(){
+    public static boolean existePronosticoParaLaRonda(int numRonda,int numFase,int idJugador){
         Connection con=getConnection();
-        int ronda=1;
+        boolean flag = false;
         try {
             if(con!=null){
                 Statement statement=con.createStatement();
-                ResultSet rs=statement.executeQuery("select ronda from partidos order by ronda");
-                while (rs.next()){
-                    ronda=rs.getInt(1);
+                ResultSet rs=statement.executeQuery("select ronda from pronosticos inner join partidos on " +
+                        "partidos.idPartido = pronosticos.idPartidos where partidos.ronda="+numRonda+" and " +
+                        "partidos.fase="+numFase+" and pronosticos.idJugador="+idJugador);
+                if (rs.next()){
+                    flag=true;
                 }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return flag;
+    }
+
+    public static int getRondaPorFaseMax(int numFase){
+        Connection con=getConnection();
+        int ronda=0;
+        try {
+            if(con!=null){
+                int i=0;
+                boolean flag= true;
+                while(flag){
+                    Statement statement=con.createStatement();
+                    ResultSet rs=statement.executeQuery("select ronda from partidos where fase="+numFase+" and ronda="+(i+1));
+                    if (rs.next()){
+                        ronda++;
+                    }else {
+                        flag=false;
+                    }
+                    i++;
+                }
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -78,30 +114,28 @@ public class SQLUtil {
         return ronda;
     }
 
-    public static ArrayList<Pronostico> getPronosticosPorRonda(int numRonda,int idJugador){
-        ArrayList<Pronostico> list=getPronosticosPorJugador(idJugador);
-        ArrayList<Pronostico> pronosticos=new ArrayList<>();
-        int i=0;
-        while(i<list.size()){
-            if(list.get(i).getPartido().getRonda()==numRonda){
-                pronosticos.add(list.get(i));
+    public static int getFaseMax(){
+        Connection con=getConnection();
+        int fase=0;
+        try {
+            if(con!=null){
+                boolean flag=true;
+                int i=0;
+                while (flag){
+                    Statement statement=con.createStatement();
+                    ResultSet rs=statement.executeQuery("select fase from partidos where fase="+ (i+1));
+                    if (rs.next()){
+                        fase++;
+                    }else {
+                        flag=false;
+                    }
+                    i++;
+                }
             }
-            i++;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return pronosticos;
-    }
-
-    public static int getCantDePartidosPorRonda(int numRonda){
-        ArrayList<Partido> list=getPartidos();
-        int i=0;
-        int cc=0;
-        while(i<list.size()){
-            if(list.get(i).getRonda()==numRonda){
-                cc++;
-            }
-            i++;
-        }
-        return cc;
+        return fase;
     }
 
     public static ArrayList<Pronostico> getPronosticos(){
@@ -143,27 +177,6 @@ public class SQLUtil {
         return jugador;
     }
 
-    public static ArrayList<Partido> getPartidos(){
-        Connection con=getConnection();
-        ArrayList<Partido> partidos=new ArrayList<>();
-        try {
-            if(con!=null){
-                Statement statement=con.createStatement();
-                ResultSet rs=statement.executeQuery("select * from partidos");
-                while (rs.next()){
-                    Partido partido=new Partido(rs.getInt(1),getEquipoPorNombre(rs.getString(2))
-                            ,getEquipoPorNombre(rs.getString(3)),rs.getInt(4),rs.getInt(5)
-                            ,rs.getString(6),rs.getInt(7));
-                    partidos.add(partido);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return partidos;
-    }
-
     public static Partido getPartidoPorId(int id){
         Connection con=getConnection();
         Partido partido=null;
@@ -174,7 +187,7 @@ public class SQLUtil {
                 while (rs.next()){
                     partido=new Partido(rs.getInt(1),getEquipoPorNombre(rs.getString(2))
                             ,getEquipoPorNombre(rs.getString(3)),rs.getInt(4),rs.getInt(5)
-                            ,rs.getString(6),rs.getInt(7));
+                            ,rs.getString(6),rs.getInt(7),rs.getInt(8));
                 }
             }
 

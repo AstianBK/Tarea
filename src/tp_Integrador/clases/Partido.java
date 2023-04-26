@@ -8,8 +8,9 @@ public class Partido {
     private final Equipo equipo2;
     private final String EstadoDelPartido;
     private final int ronda;
+    private final int fase;
 
-    public Partido(int id,Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2,String resultado,int rondaNum){
+    public Partido(int id,Equipo equipo1, Equipo equipo2, int golesEquipo1, int golesEquipo2,String resultado,int rondaNum,int fase){
         this.id=id;
         this.equipo1=equipo1;
         this.equipo2=equipo2;
@@ -17,6 +18,7 @@ public class Partido {
         this.golesEquipo2=golesEquipo2;
         this.EstadoDelPartido=resultado;
         this.ronda=rondaNum;
+        this.fase=fase;
     }
 
     public int getGolesEquipo1() {
@@ -45,5 +47,9 @@ public class Partido {
 
     public int getRonda() {
         return ronda;
+    }
+
+    public int getFase() {
+        return fase;
     }
 }
