@@ -1,0 +1,25 @@
+CREATE TABLE equipos (
+  nombre varchar(30) primary key NOT NULL,
+  descrip varchar(50) NOT NULL
+)
+CREATE TABLE jugadores (
+  idJugador int primary key NOT NULL,
+  nombre varchar(30) NOT NULL,
+  puntos int NOT NULL
+)
+CREATE TABLE partidos (
+  idPartido int primary key NOT NULL,
+  equipo1 varchar(30) references equipos,
+  equipo2 varchar(30) references equipos,
+  goles_eq1 int NOT NULL,
+  goles_eq2 int NOT NULL,
+  resultado varchar(30) NOT NULL,
+  ronda int NOT NULL
+  fase int NOT NULL
+)
+CREATE TABLE pronosticos (
+  idPronosticos int primary key NOT NULL,
+  idJugador int references jugadores,
+  idPartidos int references partidos,
+  pronostico varchar(30) NOT NULL
+)
